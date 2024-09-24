@@ -8,10 +8,11 @@
 # License
 #======================================================================
 
+do 'turtlefirewall-lib.pl';
+&ReadParse();
 
-do 'lib.pl';
-
-&header( $text{'title'}, '', undef, 1 );
+&ui_print_header( "v ".$fw->Version(), $text{'title'}, "", undef, 1, 1, 0,
+        &help_search_link("iptables", "man", "doc"));
 
 print "<br>\n";
 
@@ -96,6 +97,4 @@ if( $in{log} ne '' ) {
 
 print "<br>\n";
 
-&footer('/',$text{'index'});
-
-
+&ui_print_footer("/", $text{'index'});

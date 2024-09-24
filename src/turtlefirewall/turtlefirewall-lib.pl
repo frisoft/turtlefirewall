@@ -8,12 +8,14 @@
 
 $|=1;
 
-do '../web-lib.pl';
+# do '../web-lib.pl';
+
+BEGIN { push(@INC, ".."); };
+use WebminCore;
 &init_config();
 
-if( $ENV{REQUEST_METHOD} eq "POST" ) { ReadParseMime(); }
-else { ReadParse(); }
-
+# if( $ENV{REQUEST_METHOD} eq "POST" ) { ReadParseMime(); }
+# else { ReadParse(); }
 
 # if XML::Parser is not present
 $gotXmlParser = 0;
@@ -176,3 +178,12 @@ sub getOptionsList {
 	%{$options{log_limit_burst}} = ( 'type'=>'text', 'default'=>5, 'addunchangeopz'=>0 );
 }
 
+# At the end of lib.pl
+# open(my $log, '>>', '/tmp/turtlefirewall_debug.log') or die "Could not open log file: $!";
+# print $log "==== Checking \$fw at end of lib.pl ====\n";
+# print $log "Timestamp: " . localtime() . "\n";
+# print $log "fw is: " . (defined $fw ? (ref($fw) || "defined but not an object") : "undefined") . "\n";
+# print $log "======================================\n\n";
+# close $log;
+
+# 1;

@@ -8,10 +8,10 @@
 # License
 #======================================================================
 
+do 'turtlefirewall-lib.pl';
+&ReadParse();
 
-do 'lib.pl';
-
-&header( $text{list_nat_title}, '' );
+&ui_print_header( "$text{'list_nat_title'}", $text{'title'}, "" );
 
 showNat();
 showMasquerade();
