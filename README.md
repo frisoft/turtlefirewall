@@ -1,6 +1,7 @@
 ## Turtle Firewall 2
 
 Turtle Firewall allows you to configure a Linux firewall in a simple and fast way.
+
 It's based on Netfilter iptables. Its operation is easy to understand: you can define the different firewall elements (zones, hosts, networks, geoip) and then set the services (port, dpi) you want to control (allow, deny, ratelimit, log) among the different elements or groups of elements.
 You can do this by simply editing a XML file or using the web interface [Webmin](http://www.webmin.com/).
 
@@ -37,3 +38,13 @@ xt_time. <br>
 xt_ndpi, ( https://github.com/vel21ripn/nDPI ) <br>
 xt_geoip, ( https://codeberg.org/jengelh/xtables-addons ) <br>
 xt_ratelimit. ( https://github.com/aabc/ipt-ratelimit ) <br>
+
+## Build
+
+```
+./build-wbm
+```
+
+### install
+
+Install the .wbm.gz module using your [Webmin](http://www.webmin.com/) interface.
