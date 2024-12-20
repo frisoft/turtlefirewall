@@ -57,8 +57,8 @@ sub showConnmarkPreroute {
 
 	my $nConnmarkPreroutes = $fw->GetConnmarkPreroutesCount();
 
+	my $idx = $in{idx};
 	if( $in{table} eq 'connmarkpreroute' ) {
-		my $idx = $in{idx};
 		if( $in{down} > 0 || $in{up} > 0 ) {
 			my $newIdx = $idx;
 			if( $in{down} > 0 && $idx > 0 && $idx < $nConnmarkPreroutes ) {
@@ -79,8 +79,8 @@ sub showConnmarkPreroute {
 		my %attr = $fw->GetConnmarkPreroute($i);
 		local @cols;
 		if( $attr{'TARGET'} eq '' ) { $attr{'TARGET'} = 'ACCEPT'; }
-		my $bb = $idx == $i ? '<b>' : '';	# BoldBegin
-		my $be = $idx == $i ? '</b>' : '';	# BoldEnd
+		my $bb = $idx == $i && $in{table} eq 'connmarkpreroute' ? '<b>' : '';	# BoldBegin
+		my $be = $idx == $i && $in{table} eq 'connmarkpreroute' ? '</b>' : '';	# BoldEnd
 		my $sb = $attr{'ACTIVE'} eq 'NO' ? '<s><span style=color:grey>' : '';	# StrikeBegin
 		my $se = $attr{'ACTIVE'} eq 'NO' ? '</s></span>' : '';		# StrikeEnd
 		my $href = &ui_link("edit_connmarkpreroute.cgi?idx=$i","${sb}${bb}${i}${be}${se}");
@@ -100,7 +100,7 @@ sub showConnmarkPreroute {
 		} else {
 			my @services = split(/,/, $attr{'SERVICE'});
 			foreach my $s (@services) {
-				$servicelist .= "$icons{SERVICE}{IMAGE}${s}<br>";
+				$servicelist .= "$icons{SERVICE}{IMAGE}$s<br>";
 			}
 		}
 		push(@cols, "${sb}${bb}${servicelist}${be}${se}");
@@ -135,11 +135,6 @@ sub showConnmarkPreroute {
 		push(@cols, "${mimage}${sb}${bb}${cb}".($attr{'MARK'} ne '' ? $attr{'MARK'} : '&nbsp;')."${ce}${be}${se}" );
 		local $mover;
 		$mover .= "<table cellspacing=0 cellpadding=0><tr>";
-		#		if( $i < $nConnmarkPreroutes-1 ) {
-		#			$mover .= "<td width=50%><a href='list_manglerules.cgi?table=connmarkpreroute&idx=$i&down=5'><img src='images/down5.gif' border='0' hspace='1' vspace='0' alt='V'></a></td>";
-		#		} else {
-		#			$mover .= "<td width=50%><img src='images/gap.gif' border='0' hspace='1' vspace='0' alt='&nbsp;&nbsp;&nbsp;&nbsp;'></td>";
-		#		}
 		if( $i < $nConnmarkPreroutes ) {
 			$mover .= "<td width=50%><a href='list_manglerules.cgi?table=connmarkpreroute&idx=$i&down=1'>
 				   <img src='images/down.gif' border='0' hspace='1' vspace='0' alt='v'></a>
@@ -158,11 +153,6 @@ sub showConnmarkPreroute {
 				   <img src='images/gap.gif' border='0' hspace='1' vspace='0' alt='&nbsp;&nbsp;'>
 				   </td>";
 		}
-		#		if( $i > 2 ) {
-		#		$mover .= "<td width=50%><a href='list_manglerules.cgi?table=connmarkpreroute&idx=$i&up=5'><img src='images/up5.gif' border='0' hspace='1' vspace='0' alt='A'></a></td>";
-		#	} else {
-		#		$mover .= "<td width=50%><img src='images/gap.gif' border='0' hspace='1' vspace='0' alt='&nbsp;&nbsp;'></td>";
-		#	}
 		$mover .= "</tr></table>";
 		push(@cols, $mover);
 		print &ui_checked_columns_row(\@cols, \@tds, "d", $i);
@@ -208,8 +198,8 @@ sub showConnmark {
 
 	my $nConnmarks = $fw->GetConnmarksCount();
 
+	my $idx = $in{idx};
 	if( $in{table} eq 'connmark' ) {
-		my $idx = $in{idx};
 		if( $in{down} > 0 || $in{up} > 0 ) {
 			my $newIdx = $idx;
 			if( $in{down} > 0 && $idx > 0 && $idx < $nConnmarks ) {
@@ -230,8 +220,8 @@ sub showConnmark {
 		my %attr = $fw->GetConnmark($i);
 		local @cols;
 		if( $attr{'TARGET'} eq '' ) { $attr{'TARGET'} = 'ACCEPT'; }
-		my $bb = $idx == $i ? '<b>' : '';	# BoldBegin
-		my $be = $idx == $i ? '</b>' : '';	# BoldEnd
+		my $bb = $idx == $i && $in{table} eq 'connmark' ? '<b>' : '';	# BoldBegin
+		my $be = $idx == $i && $in{table} eq 'connmark' ? '</b>' : '';	# BoldEnd
 		my $sb = $attr{'ACTIVE'} eq 'NO' ? '<s><span style=color:grey>' : '';	# StrikeBegin
 		my $se = $attr{'ACTIVE'} eq 'NO' ? '</s></span>' : '';		# StrikeEnd
 		my $href = &ui_link("edit_connmark.cgi?idx=$i","${sb}${bb}${i}${be}${se}");
@@ -261,7 +251,7 @@ sub showConnmark {
 		} else {
 			my @services = split(/,/, $attr{'SERVICE'});
 			foreach my $s (@services) {
-				$servicelist .= "$icons{SERVICE}{IMAGE}${s}<br>";
+				$servicelist .= "$icons{SERVICE}{IMAGE}$s<br>";
 			}
 		}
 		push(@cols, "${sb}${bb}${servicelist}${be}${se}");
@@ -296,11 +286,6 @@ sub showConnmark {
 		push(@cols, "${mimage}${sb}${bb}${cb}".($attr{'MARK'} ne '' ? $attr{'MARK'} : '&nbsp;')."${ce}${be}${se}" );
 		local $mover;
 		$mover .= "<table cellspacing=0 cellpadding=0><tr>";
-		#		if( $i < $nConnmarks-1 ) {
-		#			$mover .= "<td width=50%><a href='list_manglerules.cgi?table=connmark&idx=$i&down=5'><img src='images/down5.gif' border='0' hspace='1' vspace='0' alt='V'></a></td>";
-		#		} else {
-		#			$mover .= "<td width=50%><img src='images/gap.gif' border='0' hspace='1' vspace='0' alt='&nbsp;&nbsp;&nbsp;&nbsp;'></td>";
-		#		}
 		if( $i < $nConnmarks ) {
 			$mover .= "<td width=50%><a href='list_manglerules.cgi?table=connmark&idx=$i&down=1'>
 				   <img src='images/down.gif' border='0' hspace='1' vspace='0' alt='v'></a>
@@ -319,11 +304,6 @@ sub showConnmark {
 				   <img src='images/gap.gif' border='0' hspace='1' vspace='0' alt='&nbsp;&nbsp;'>
 				   </td>";
 		}
-		#		if( $i > 2 ) {
-		#		$mover .= "<td width=50%><a href='list_manglerules.cgi?table=connmark&idx=$i&up=5'><img src='images/up5.gif' border='0' hspace='1' vspace='0' alt='A'></a></td>";
-		#	} else {
-		#		$mover .= "<td width=50%><img src='images/gap.gif' border='0' hspace='1' vspace='0' alt='&nbsp;&nbsp;'></td>";
-		#	}
 		$mover .= "</tr></table>";
 		push(@cols, $mover);
 		print &ui_checked_columns_row(\@cols, \@tds, "d", $i);

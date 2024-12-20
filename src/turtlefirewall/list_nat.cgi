@@ -54,55 +54,60 @@ sub showNat {
 
 	$nNat = $fw->GetNatsCount();
 
+	my $idx = $in{idx};
 	if( $in{table} eq 'nat' ) {
-		my $idx = $in{idx};
-		if( $in{down} ne '' && $idx > 0 && $idx < $nNat ) {
-			my %appo = $fw->GetNat($idx+1);
-			$fw->AddNatAttr($idx+1, $fw->GetNat($idx));
-			$fw->AddNatAttr($idx, %appo);
+		if( $in{down} > 0 || $in{up} > 0 ) {
+			my $newIdx = $idx;
+			if( $in{down} > 0 && $idx > 0 && $idx < $nNat ) {
+				$newIdx = $idx + $in{down};
+				if( $newIdx > $nNat ) { $newIdx = $nNat; }
+			}
+			if( $in{up} > 0 && $idx > 1 && $idx <= $nNat ) {
+				$newIdx = $idx - $in{up};
+				if( $newIdx < 1 ) { $newIdx = 1; }
+			}
+			$fw->MoveNat( $idx, $newIdx );
+			$fw->SaveFirewall();
+			$idx=$newIdx;
 		}
-		if( $in{up} ne '' && $idx > 1 && $idx <= $nNat ) {
-			my %appo = $fw->GetNat($idx-1);
-			$fw->AddNatAttr($idx-1, $fw->GetNat($idx));
-			$fw->AddNatAttr($idx, %appo);
-		}
-		$fw->SaveFirewall();
 	}
 
 	for( my $i=1; $i<=$nNat; $i++ ) {
 		my %attr = $fw->GetNat( $i );
 		local @cols;
+		my $bb = $idx == $i && $in{table} eq 'nat' ? '<b>' : '';       # BoldBegin
+		my $be = $idx == $i && $in{table} eq 'nat'? '</b>' : '';      # BoldEnd
 		my $sb = $attr{'ACTIVE'} eq 'NO' ? '<s><span style=color:grey>' : '';	# StrikeBegin
 		my $se = $attr{'ACTIVE'} eq 'NO' ? '</s></span>' : '';		# StrikeEnd
-		my $href = &ui_link("edit_nat.cgi?idx=$i","${sb}${i}${se}");
+		my $href = &ui_link("edit_nat.cgi?idx=$i","${sb}${bb}${i}${be}${se}");
 		push(@cols, $href );
 		my %zone = $fw->GetZone($attr{'VIRTUAL'});
 		if( $zone{IF} ne '' ) {
-			push(@cols, "$icons{ZONE}{IMAGE}${sb}$attr{'VIRTUAL'} ($zone{'IF'})${se}" );
+			push(@cols, "$icons{ZONE}{IMAGE}${sb}${bb}$attr{'VIRTUAL'} ($zone{'IF'})${be}${se}" );
 		} else {
-			push(@cols, "$icons{HOST}{IMAGE}${sb}$attr{'VIRTUAL'}${se}" );
+			push(@cols, "$icons{HOST}{IMAGE}${sb}${bb}$attr{'VIRTUAL'}${be}${se}" );
 		}
-		push(@cols, "$icons{HOST}{IMAGE}${sb}$attr{'REAL'}${se}" );
+		push(@cols, "$icons{HOST}{IMAGE}${sb}${bb}$attr{'REAL'}${be}${se}" );
 		my $servicelist = '';
 		if( $attr{'SERVICE'} eq 'tcp' || $attr{'SERVICE'} eq 'udp' ) {
 			if( $attr{'PORT'} ne '' ) {
 				$servicelist .= "$icons{SERVICE}{IMAGE}$attr{'SERVICE'}/$attr{'PORT'}";
 			} else {
-				$servicelist .= "$icons{SERVICE}{IMAGE}{'SERVICE'}/all";
+				$servicelist .= "$icons{SERVICE}{IMAGE}$attr{'SERVICE'}/all";
 			}
 		} else {
 			my @services = split(/,/, $attr{'SERVICE'});
 			foreach my $s (@services) {
-				$servicelist .= "$icons{SERVICE}{IMAGE}${s}<br>";
+				$servicelist .= "$icons{SERVICE}{IMAGE}$s<br>";
 			}
 		}
-		push(@cols, "${sb}${servicelist}${se}");
+		push(@cols, "${sb}${bb}${servicelist}${be}${se}");
 		my $cb = $sb eq '' ? '<span style=color:green>' : '';	# ColourBegin
 		my $ce = $se eq '' ? '</span>' : '';           		# ColourEnd
 		my $nimage = $attr{'ACTIVE'} eq 'NO' ? $icons{NAT}{IMAGE} : $icons{NAT_A}{IMAGE};
-		push(@cols, "${nimage}${sb}${cb}$text{YES}${ce}${se}" );
+		push(@cols, "${nimage}${sb}${bb}${cb}$text{YES}${ce}${be}${se}" );
 		my $timage = $attr{'TOPORT'} eq '' ? '' : $icons{TOPORT}{IMAGE};
-		push(@cols, "${timage}${sb}$attr{'TOPORT'}${se}" );
+		push(@cols, "${timage}${sb}${bb}$attr{'TOPORT'}${be}${se}" );
 		local $mover;
 		$mover .= "<table cellspacing=0 cellpadding=0><tr>";
 
@@ -160,33 +165,38 @@ sub showMasquerade {
 
 	my $nMasq = $fw->GetMasqueradesCount();
 	
+	my $idx = $in{idx};
 	if( $in{table} eq 'masquerade' ) {
-		my $idx = $in{idx};
-		if( $in{down} ne '' && $idx > 0 && $idx < $nMasq ) {
-			my %appo = $fw->GetMasquerade($idx+1);
-			$fw->AddMasqueradeAttr($idx+1, $fw->GetMasquerade($idx));
-			$fw->AddMasqueradeAttr($idx, %appo);
+		if( $in{down} > 0 || $in{up} > 0 ) {
+			my $newIdx = $idx;
+			if( $in{down} > 0 && $idx > 0 && $idx < $nMasq ) {
+				$newIdx = $idx + $in{down};
+				if( $newIdx > $nMasq ) { $newIdx = $nMasq; }
+			}
+			if( $in{up} > 0 && $idx > 1 && $idx <= $nMasq ) {
+				$newIdx = $idx - $in{up};
+				if( $newIdx < 1 ) { $newIdx = 1; }
+			}
+			$fw->MoveMasquerade( $idx, $newIdx );
+			$fw->SaveFirewall();
+			$idx=$newIdx;
 		}
-		if( $in{up} ne '' && $idx > 1 && $idx <= $nMasq ) {
-			my %appo = $fw->GetMasquerade($idx-1);
-			$fw->AddMasqueradeAttr($idx-1, $fw->GetMasquerade($idx));
-			$fw->AddMasqueradeAttr($idx, %appo);
-		}
-		$fw->SaveFirewall();
-	}	
-	
+	}
+
 	for( my $i=1; $i<=$nMasq; $i++ ) {
 		my %attr = $fw->GetMasquerade( $i );
 		local @cols;
+		my $bb = $idx == $i && $in{table} eq 'masquerade' ? '<b>' : '';       # BoldBegin
+		my $be = $idx == $i && $in{table} eq 'masquerade' ? '</b>' : '';      # BoldEnd
 		my $sb = $attr{'ACTIVE'} eq 'NO' ? '<s><span style=color:grey>' : '';	# StrikeBegin
 		my $se = $attr{'ACTIVE'} eq 'NO' ? '</s></span>' : '';		# StrikeEnd
-		my $href = &ui_link("edit_masquerade.cgi?idx=$i","${sb}${i}${se}");
+		my $href = &ui_link("edit_masquerade.cgi?idx=$i","${sb}${bb}${i}${be}${se}");
 		push(@cols, $href );
 		my $type = '';
 		$type = $fw->GetItemType($attr{'SRC'});
-		push(@cols, "$icons{$type}{IMAGE}${sb}$attr{'SRC'}${se}" );
+		push(@cols, "$icons{$type}{IMAGE}${sb}${bb}$attr{'SRC'}${be}${se}" );
 		$type = $fw->GetItemType($attr{'DST'});
-		push(@cols, "$icons{$type}{IMAGE}${sb}$attr{'DST'}${se}" );
+		push(@cols, "$icons{$type}{IMAGE}${sb}${bb}$attr{'DST'}${be}${se}" );
 		my $servicelist = '';
 		if( $attr{'SERVICE'} eq 'tcp' || $attr{'SERVICE'} eq 'udp' ) {
 			if( $attr{'PORT'} ne '' ) {
@@ -197,20 +207,20 @@ sub showMasquerade {
 		} else {
 			my @services = split(/,/, $attr{'SERVICE'});
 			foreach my $s (@services) {
-				$servicelist .= "$icons{SERVICE}{IMAGE}${s}<br>";
+				$servicelist .= "$icons{SERVICE}{IMAGE}$s<br>";
 			}
 		}
-		push(@cols, "${sb}${servicelist}${se}");
+		push(@cols, "${sb}${bb}${servicelist}${be}${se}");
 		if( $attr{'MASQUERADE'} eq 'NO' ) {
 			my $cb = $sb eq '' ? '<span style=color:red>' : '';	# ColourBegin
 			my $ce = $se eq '' ? '</span>' : '';		# ColourEnd
 			my $dimage = $attr{'ACTIVE'} eq 'NO' ? $icons{MASQUERADE}{IMAGE} : $icons{MASQUERADE_NO}{IMAGE};
-			push(@cols, "${dimage}${sb}${cb}$text{NO}${ce}${se}" );
+			push(@cols, "${dimage}${sb}${bb}${cb}$text{NO}${ce}${be}${se}" );
 		} else {
 			my $cb = $sb eq '' ? '<span style=color:green>' : '';	# ColourBegin
 			my $ce = $se eq '' ? '</span>' : '';			# ColourEnd
 			my $aimage = $attr{'ACTIVE'} eq 'NO' ? $icons{MASQUERADE}{IMAGE} : $icons{MASQUERADE_A}{IMAGE};
-			push(@cols, "${aimage}${sb}${cb}$text{YES}${ce}${se}" );
+			push(@cols, "${aimage}${sb}${bb}${cb}$text{YES}${ce}${be}${se}" );
 		}
 		local $mover;
 		$mover .= "<table cellspacing=0 cellpadding=0><tr>";
@@ -269,33 +279,39 @@ sub showRedirect {
 		 	  "<b>$text{'redirect_move'}</b>" ], 100, 0, \@tds);
 
 	my $nRedirect = $fw->GetRedirectCount();
+
+	my $idx = $in{idx};
 	if( $in{table} eq 'redirect' ) {
-		my $idx = $in{idx};
-		if( $in{down} ne '' && $idx > 0 && $idx < $nRedirect ) {
-			my %appo = $fw->GetRedirect($idx+1);
-			$fw->AddRedirectAttr($idx+1, $fw->GetRedirect($idx));
-			$fw->AddRedirectAttr($idx, %appo);
+		if( $in{down} > 0 || $in{up} > 0 ) {
+			my $newIdx = $idx;
+			if( $in{down} > 0 && $idx > 0 && $idx < $nRedirect ) {
+				$newIdx = $idx + $in{down};
+				if( $newIdx > $nRedirect ) { $newIdx = $nRedirect; }
+			}
+			if( $in{up} > 0 && $idx > 1 && $idx <= $nRedirect ) {
+				$newIdx = $idx - $in{up};
+				if( $newIdx < 1 ) { $newIdx = 1; }
+			}
+			$fw->MoveRedirect( $idx, $newIdx );
+			$fw->SaveFirewall();
+			$idx=$newIdx;
 		}
-		if( $in{up} ne '' && $idx > 1 && $idx <= $nRedirect ) {
-			my %appo = $fw->GetRedirect($idx-1);
-			$fw->AddRedirectAttr($idx-1, $fw->GetRedirect($idx));
-			$fw->AddRedirectAttr($idx, %appo);
-		}
-		$fw->SaveFirewall();
 	}
 
 	for( my $i=1; $i<=$nRedirect; $i++ ) {
 		my %attr = $fw->GetRedirect( $i );
 		local @cols;
+		my $bb = $idx == $i && $in{table} eq 'redirect' ? '<b>' : '';       # BoldBegin
+		my $be = $idx == $i && $in{table} eq 'redirect' ? '</b>' : '';      # BoldEnd
 		my $sb = $attr{'ACTIVE'} eq 'NO' ? '<s><span style=color:grey>' : '';	# StrikeBegin
 		my $se = $attr{'ACTIVE'} eq 'NO' ? '</s></span>' : '';		# StrikeEnd
-		my $href = &ui_link("edit_redirect.cgi?idx=$i","${sb}${i}${se}");
+		my $href = &ui_link("edit_redirect.cgi?idx=$i","${sb}${bb}${i}${be}${se}");
 		push(@cols, $href );
 		my $type = '';
 		$type = $fw->GetItemType($attr{'SRC'});
-		push(@cols, "$icons{$type}{IMAGE}${sb}$attr{'SRC'}${se}" );
+		push(@cols, "$icons{$type}{IMAGE}${sb}${bb}$attr{'SRC'}${be}${se}" );
 		$type = $fw->GetItemType($attr{'DST'});
-		push(@cols, "$icons{$type}{IMAGE}${sb}$attr{'DST'}${se}" );
+		push(@cols, "$icons{$type}{IMAGE}${sb}${bb}$attr{'DST'}${be}${se}" );
 		my $servicelist = '';
 		if( $attr{'SERVICE'} eq 'tcp' || $attr{'SERVICE'} eq 'udp' ) {
 			if( $attr{'PORT'} ne '' ) {
@@ -306,23 +322,23 @@ sub showRedirect {
 		} else {
 			my @services = split(/,/, $attr{'SERVICE'});
 			foreach my $s (@services) {
-				$servicelist .= "$icons{SERVICE}{IMAGE}${s}<br>";
+				$servicelist .= "$icons{SERVICE}{IMAGE}$s<br>";
 			}
 		}
-		push(@cols, "${sb}${servicelist}${se}");
+		push(@cols, "${sb}${bb}${servicelist}${be}${se}");
 		if( $attr{'REDIRECT'} eq 'NO' ) {
 			my $cb = $sb eq '' ? '<span style=color:red>' : '';	# ColourBegin
 			my $ce = $se eq '' ? '</span>' : '';		# ColourEnd
 			my $dimage = $attr{'ACTIVE'} eq 'NO' ? $icons{REDIRECT}{IMAGE} : $icons{REDIRECT_NO}{IMAGE};
-			push(@cols, "${dimage}${sb}${cb}$text{NO}${ce}${se}" );
+			push(@cols, "${dimage}${sb}${bb}${cb}$text{NO}${ce}${be}${se}" );
 			push(@cols, "" );
 		} else {
 			my $cb = $sb eq '' ? '<span style=color:green>' : '';	# ColourBegin
 			my $ce = $se eq '' ? '</span>' : '';			# ColourEnd
 			my $aimage = $attr{'ACTIVE'} eq 'NO' ? $icons{REDIRECT}{IMAGE} : $icons{REDIRECT_A}{IMAGE};
-			push(@cols, "${aimage}${sb}${cb}$text{YES}${ce}${se}" );
+			push(@cols, "${aimage}${sb}${bb}${cb}$text{YES}${ce}${be}${se}" );
 			my $timage = $attr{'TOPORT'} eq '' ? '' : $icons{TOPORT}{IMAGE};
-			push(@cols, "${timage}${sb}$attr{'TOPORT'}${se}" );
+			push(@cols, "${timage}${sb}${bb}$attr{'TOPORT'}${be}${se}" );
 		}
 		local $mover;
 		$mover .= "<table cellspacing=0 cellpadding=0><tr>";

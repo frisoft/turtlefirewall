@@ -49,8 +49,8 @@ sub showConntrackPreroute {
 
 	my $nConntrackPreroutes = $fw->GetConntrackPreroutesCount();
 
+	my $idx = $in{idx};
 	if( $in{table} eq 'conntrackpreroute' ) {
-		my $idx = $in{idx};
 		if( $in{down} > 0 || $in{up} > 0 ) {
 			my $newIdx = $idx;
 			if( $in{down} > 0 && $idx > 0 && $idx < $nConntrackPreroutes ) {
@@ -71,8 +71,8 @@ sub showConntrackPreroute {
 		my %attr = $fw->GetConntrackPreroute($i);
 		local @cols;
 		if( $attr{'TARGET'} eq '' ) { $attr{'TARGET'} = 'ACCEPT'; }
-		my $bb = $idx == $i ? '<b>' : '';	# BoldBegin
-		my $be = $idx == $i ? '</b>' : '';	# BoldEnd
+		my $bb = $idx == $i && $in{table} eq 'conntrackpreroute' ? '<b>' : '';	# BoldBegin
+		my $be = $idx == $i && $in{table} eq 'conntrackpreroute' ? '</b>' : '';	# BoldEnd
 		my $sb = $attr{'ACTIVE'} eq 'NO' ? '<s><span style=color:grey>' : '';	# StrikeBegin
 		my $se = $attr{'ACTIVE'} eq 'NO' ? '</s></span>' : '';		# StrikeEnd
 		my $href = &ui_link("edit_conntrackpreroute.cgi?idx=$i","${sb}${bb}${i}${be}${se}");
@@ -82,18 +82,17 @@ sub showConntrackPreroute {
 		push(@cols, "$icons{$type}{IMAGE}${sb}${bb}$attr{'SRC'}${be}${se}" );
 		$type = $fw->GetItemType($attr{'DST'});
 		push(@cols, "$icons{$type}{IMAGE}${sb}${bb}$attr{'DST'}${be}${se}" );
-		push(@cols, "$icons{SERVICE}{IMAGE}${sb}${bb}$attr{'SERVICE'}/$attr{'PORT'}${be}${se}");
+		if( $attr{'PORT'} ne '' ) {
+			push(@cols, "$icons{SERVICE}{IMAGE}${sb}${bb}$attr{'SERVICE'}/$attr{'PORT'}${be}${se}");
+		} else {
+			push(@cols, "$icons{SERVICE}{IMAGE}${sb}${bb}$attr{'SERVICE'}/all${be}${se}");
+		}
 		my $cb = $sb eq '' ? '<span style=color:green>' : '';	# ColourBegin
 		my $ce = $se eq '' ? '</span>' : '';           		# ColourEnd
 		my $himage = $attr{'ACTIVE'} eq 'NO' ? $icons{HELPER}{IMAGE} : $icons{HELPER_A}{IMAGE};
 		push(@cols, "${himage}${sb}${bb}${cb}".($attr{'HELPER'} ne '' ? $attr{'HELPER'} : '&nbsp;')."${ce}${be}${se}" );
 		local $mover;
 		$mover .= "<table cellspacing=0 cellpadding=0><tr>";
-		#		if( $i < $nConntrackPreroutes-1 ) {
-		#			$mover .= "<td width=50%><a href='list_rawrules.cgi?table=conntrackpreroute&idx=$i&down=5'><img src='images/down5.gif' border='0' hspace='1' vspace='0' alt='V'></a></td>";
-		#		} else {
-		#			$mover .= "<td width=50%><img src='images/gap.gif' border='0' hspace='1' vspace='0' alt='&nbsp;&nbsp;&nbsp;&nbsp;'></td>";
-		#		}
 		if( $i < $nConntrackPreroutes ) {
 			$mover .= "<td width=50%><a href='list_rawrules.cgi?table=conntrackpreroute&idx=$i&down=1'>
 				   <img src='images/down.gif' border='0' hspace='1' vspace='0' alt='v'></a>
@@ -112,11 +111,6 @@ sub showConntrackPreroute {
 				   <img src='images/gap.gif' border='0' hspace='1' vspace='0' alt='&nbsp;&nbsp;'>
 				   </td>";
 		}
-		#		if( $i > 2 ) {
-		#		$mover .= "<td width=50%><a href='list_rawrules.cgi?table=conntrackpreroute&idx=$i&up=5'><img src='images/up5.gif' border='0' hspace='1' vspace='0' alt='A'></a></td>";
-		#	} else {
-		#		$mover .= "<td width=50%><img src='images/gap.gif' border='0' hspace='1' vspace='0' alt='&nbsp;&nbsp;'></td>";
-		#	}
 		$mover .= "</tr></table>";
 		push(@cols, $mover);
 		print &ui_checked_columns_row(\@cols, \@tds, "d", $i);
@@ -154,8 +148,8 @@ sub showConntrack {
 
 	my $nConntracks = $fw->GetConntracksCount();
 
+	my $idx = $in{idx};
 	if( $in{table} eq 'conntrack' ) {
-		my $idx = $in{idx};
 		if( $in{down} > 0 || $in{up} > 0 ) {
 			my $newIdx = $idx;
 			if( $in{down} > 0 && $idx > 0 && $idx < $nConntracks ) {
@@ -176,8 +170,8 @@ sub showConntrack {
 		my %attr = $fw->GetConntrack($i);
 		local @cols;
 		if( $attr{'TARGET'} eq '' ) { $attr{'TARGET'} = 'ACCEPT'; }
-		my $bb = $idx == $i ? '<b>' : '';	# BoldBegin
-		my $be = $idx == $i ? '</b>' : '';	# BoldEnd
+		my $bb = $idx == $i && $in{table} eq 'conntrack' ? '<b>' : '';	# BoldBegin
+		my $be = $idx == $i && $in{table} eq 'conntrack' ? '</b>' : '';	# BoldEnd
 		my $sb = $attr{'ACTIVE'} eq 'NO' ? '<s><span style=color:grey>' : '';	# StrikeBegin
 		my $se = $attr{'ACTIVE'} eq 'NO' ? '</s></span>' : '';		# StrikeEnd
 		my $href = &ui_link("edit_conntrack.cgi?idx=$i","${sb}${bb}${i}${be}${se}");
@@ -187,18 +181,17 @@ sub showConntrack {
 		push(@cols, "$icons{$type}{IMAGE}${sb}${bb}$attr{'SRC'}${be}${se}" );
 		$type = $fw->GetItemType($attr{'DST'});
 		push(@cols, "$icons{$type}{IMAGE}${sb}${bb}$attr{'DST'}${be}${se}" );
-		push(@cols, "$icons{SERVICE}{IMAGE}${sb}${bb}$attr{'SERVICE'}/$attr{'PORT'}${be}${se}");
+		if( $attr{'PORT'} ne '' ) {
+			push(@cols, "$icons{SERVICE}{IMAGE}${sb}${bb}$attr{'SERVICE'}/$attr{'PORT'}${be}${se}");
+		} else {
+			push(@cols, "$icons{SERVICE}{IMAGE}${sb}${bb}$attr{'SERVICE'}/all${be}${se}");
+		}
 		my $cb = $sb eq '' ? '<span style=color:green>' : '';	# ColourBegin
 		my $ce = $se eq '' ? '</span>' : '';           		# ColourEnd
 		my $himage = $attr{'ACTIVE'} eq 'NO' ? $icons{HELPER}{IMAGE} : $icons{HELPER_A}{IMAGE};
 		push(@cols, "${himage}${sb}${bb}${cb}".($attr{'HELPER'} ne '' ? $attr{'HELPER'} : '&nbsp;')."${ce}${be}${se}" );
 		local $mover;
 		$mover .= "<table cellspacing=0 cellpadding=0><tr>";
-		#		if( $i < $nConntracks-1 ) {
-		#			$mover .= "<td width=50%><a href='list_rawrules.cgi?table=conntrack&idx=$i&down=5'><img src='images/down5.gif' border='0' hspace='1' vspace='0' alt='V'></a></td>";
-		#		} else {
-		#			$mover .= "<td width=50%><img src='images/gap.gif' border='0' hspace='1' vspace='0' alt='&nbsp;&nbsp;&nbsp;&nbsp;'></td>";
-		#		}
 		if( $i < $nConntracks ) {
 			$mover .= "<td width=50%><a href='list_rawrules.cgi?table=conntrack&idx=$i&down=1'>
 				   <img src='images/down.gif' border='0' hspace='1' vspace='0' alt='v'></a>
@@ -217,11 +210,6 @@ sub showConntrack {
 				   <img src='images/gap.gif' border='0' hspace='1' vspace='0' alt='&nbsp;&nbsp;'>
 				   </td>";
 		}
-		#		if( $i > 2 ) {
-		#		$mover .= "<td width=50%><a href='list_rawrules.cgi?table=conntrack&idx=$i&up=5'><img src='images/up5.gif' border='0' hspace='1' vspace='0' alt='A'></a></td>";
-		#	} else {
-		#		$mover .= "<td width=50%><img src='images/gap.gif' border='0' hspace='1' vspace='0' alt='&nbsp;&nbsp;'></td>";
-		#	}
 		$mover .= "</tr></table>";
 		push(@cols, $mover);
 		print &ui_checked_columns_row(\@cols, \@tds, "d", $i);
